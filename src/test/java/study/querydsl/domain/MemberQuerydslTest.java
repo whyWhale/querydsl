@@ -2,6 +2,8 @@ package study.querydsl.domain;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +17,6 @@ import javax.persistence.PersistenceUnit;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.setLenientDateParsing;
 import static study.querydsl.domain.QMember.member;
 import static study.querydsl.domain.QTeam.team;
 
@@ -88,12 +89,23 @@ public class MemberQuerydslTest {
         em.persist(d);
 
         //when
-        List<Member> members = queryFactory.selectFrom(member).orderBy(member.age.desc(), member.username.asc().nullsFirst()).fetch();
+        List<Member> members = queryFactory.selectFrom(member).orderBy(defaultCondition()).fetch();
+
+        List<Member> members2 = queryFactory.selectFrom(member).orderBy(TwoCondition()).fetch();
 
         //then
-        assertThat(members.get(0).getUsername()).isNull();
-        assertThat(members.get(1).getUsername()).isNull();
+        assertThat(members2.get(0).getUsername()).isNull();
+        assertThat(members2.get(1).getUsername()).isNull();
     }
+
+    private OrderSpecifier[] TwoCondition() {
+        return new OrderSpecifier[]{member.age.desc(), member.username.asc().nullsFirst()};
+    }
+
+    private OrderSpecifier[] defaultCondition() {
+        return new OrderSpecifier[]{member.id.asc()};
+    }
+
 
     @Test
     public void pagingTest() {
@@ -245,6 +257,65 @@ public class MemberQuerydslTest {
         //then
         assertThat(loaded).as("fetch Join ").isTrue();
 
+    }
+
+    @Test
+    public void subQuery() throws Exception{
+        //given
+        QMember sub=new QMember("subMember");
+        //when
+        List<Member> maxAgeMembers = queryFactory.selectFrom(member).where(member.age.eq(JPAExpressions.select(sub.age.max()).from(sub))).fetch();
+
+        //then
+        assertThat(maxAgeMembers).extracting("age").containsExactly(33);
+    }
+
+    @Test
+    public void subQuery2() throws Exception{
+        //given
+        int avg = (10 + 22 + 27 + 33)/4;
+        QMember sub = new QMember("sub");
+        //when
+        List<Member> avgAgeGtMembers = queryFactory.selectFrom(member).where(member.age.gt(JPAExpressions.select(sub.age.avg()).from(sub))).fetch();
+
+        //then
+        for (Member avgAgeGtMember : avgAgeGtMembers) {
+            System.out.println("avgAgeGtMember = " + avgAgeGtMember);
+        }
+        assertThat(avgAgeGtMembers).extracting("username").containsExactly("W","D");
+    }
+
+    @Test
+    public void suqQuery3() throws Exception{
+        //given
+        QMember sub = new QMember("sub");
+        //when
+        List<Tuple> members = queryFactory.select(member.username, JPAExpressions
+                .select(sub.age.avg()).from(sub)).from(member).fetch();
+        //then
+        for (Tuple tuple : members) {
+            System.out.println("tuple = " + tuple);
+            System.out.println(tuple.get(JPAExpressions.select(sub.age.avg()).from(sub)));
+        }
+
+        for (int i = 0; i < 4; i++) {
+            assertThat(members.get(i).get(JPAExpressions.select(sub.age.avg()).from(sub))).isEqualTo(23.0);
+        }
+
+    }
+
+    @Test
+    public void subQuery4() throws Exception{
+        //given
+        QMember sub = new QMember("sub");
+        //when
+        List<Member> gt10Members = queryFactory.selectFrom(member).where(member.age.in(JPAExpressions
+                .select(sub.age).from(sub).where(sub.age.gt(10)))).fetch();
+        //then
+        for (Member gt10Member : gt10Members) {
+            System.out.println("gt10Member = " + gt10Member);
+        }
+        assertThat(gt10Members).extracting("age").containsExactly(27,22,33);
     }
 
 }
