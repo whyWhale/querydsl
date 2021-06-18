@@ -7,6 +7,9 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -325,6 +328,59 @@ public class MemberQuerydslTest {
             System.out.println("gt10Member = " + gt10Member);
         }
         assertThat(gt10Members).extracting("age").containsExactly(27, 22, 33);
+    }
+
+
+    @Test
+    public void Case() throws Exception{
+        //given
+
+        //when
+        List<String> CaseMembers = queryFactory.select(new CaseBuilder()
+                .when(member.age.between(0, 20)).then("미성년자")
+                .otherwise("성인")).from(member).fetch();
+        //then
+        assertThat(CaseMembers.get(0)).isEqualTo("미성년자");
+        for (int i =1; i < 4; i++) {
+            assertThat(CaseMembers.get(i)).isEqualTo("성인");
+        }
+    }
+
+    @Test
+    public void Case2() throws Exception{
+        //given
+
+        //when
+        NumberExpression<Integer> Rank = new CaseBuilder()
+                .when(member.age.between(0, 20)).then(3)
+                .when(member.age.between(21, 30)).then(2)
+                .otherwise(1);
+
+        List<Tuple> tuples = queryFactory.select(member.username, member.age, Rank)
+                .from(member).orderBy(Rank.desc()).fetch();
+        //then
+        assertThat(tuples.get(0).get(Rank)).isEqualTo(3);
+        assertThat(tuples.get(1).get(Rank)).isEqualTo(2);
+        assertThat(tuples.get(2).get(Rank)).isEqualTo(2);
+        assertThat(tuples.get(3).get(Rank)).isEqualTo(1);
+
+    }
+
+    @Test
+    public void Constant() throws Exception{
+        //given
+
+        //when
+        List<Tuple> tuples = queryFactory.select(member.username, Expressions.constant("A"))
+                .from(member).fetch();
+
+        List<String> stringList = queryFactory.select(member.username.concat("_").concat(member.age.stringValue()))
+                .from(member).fetch();
+        //then
+
+        tuples.forEach(tuple -> System.out.println("tuple = " + tuple));
+
+        stringList.forEach(System.out::println);
     }
 
     @Test
