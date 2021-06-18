@@ -1,6 +1,7 @@
 package study.querydsl.domain;
 
 import lombok.*;
+import study.querydsl.controller.responseDto.MemberResponseDto;
 
 import javax.persistence.*;
 import java.util.List;
@@ -39,4 +40,10 @@ public class Member {
         this.team=team;
         team.getMemberList().add(this);
     }
+
+    public MemberResponseDto toDto()
+    {
+        return new MemberResponseDto(username,age);
+    }
+
 }
