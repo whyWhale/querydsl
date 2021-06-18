@@ -1,20 +1,28 @@
 package study.querydsl.domain;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import study.querydsl.controller.responseDto.MemberResponseDto;
+import study.querydsl.controller.responseDto.QMemberResponseDto;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.domain.QMember.member;
@@ -149,7 +157,7 @@ public class MemberQuerydslTest {
     public void groupBy() throws Exception {
         //given
         int a = 10 / 1;
-        int b =  (27 + 22 + 33) / 3;
+        int b = (27 + 22 + 33) / 3;
 
         //when
         List<Tuple> joinTeamMember = queryFactory.select(team.name, member.age.avg())
@@ -170,7 +178,7 @@ public class MemberQuerydslTest {
 
 
     @Test
-    public void Join() throws Exception{
+    public void Join() throws Exception {
         //given
 
         //when
@@ -181,20 +189,20 @@ public class MemberQuerydslTest {
         assertThat(teamA.isEmpty()).isEqualTo(false);
         assertThat(teamA).extracting("username").containsExactly("A");
     }
-    
+
     @Test
-    public void ThetaJoin() throws Exception{
+    public void ThetaJoin() throws Exception {
         //given
 
         //when
         List<Member> ThetaMember = queryFactory.select(member).from(member, team).where(member.username.eq(team.name)).fetch();
         //then
-        assertThat(ThetaMember).extracting("username").containsExactly("A","B");
+        assertThat(ThetaMember).extracting("username").containsExactly("A", "B");
     }
 
 
     @Test
-    public void JoinOnFilter() throws Exception{
+    public void JoinOnFilter() throws Exception {
         //given
         Member a = Member.builder().username("ABC").age(100).build();
         Member b = Member.builder().username("DEF").age(100).build();
@@ -211,7 +219,7 @@ public class MemberQuerydslTest {
     }
 
     @Test
-    public void JoinOn_notRelation() throws Exception{
+    public void JoinOn_notRelation() throws Exception {
         //given
         Member a = Member.builder().age(100).username("A").build();
         Member b = Member.builder().age(100).username("B").build();
@@ -231,7 +239,7 @@ public class MemberQuerydslTest {
     EntityManagerFactory emf;
 
     @Test
-    public void NotFetchJoin() throws Exception{
+    public void NotFetchJoin() throws Exception {
         //given
         em.flush();
         em.clear();
@@ -244,8 +252,9 @@ public class MemberQuerydslTest {
         assertThat(loaded).as("일반 적 조회(페치조인 x)").isFalse();
 
     }
+
     @Test
-    public void FetchJoin() throws Exception{
+    public void FetchJoin() throws Exception {
         //given
         em.flush();
         em.clear();
@@ -260,9 +269,9 @@ public class MemberQuerydslTest {
     }
 
     @Test
-    public void subQuery() throws Exception{
+    public void subQuery() throws Exception {
         //given
-        QMember sub=new QMember("subMember");
+        QMember sub = new QMember("subMember");
         //when
         List<Member> maxAgeMembers = queryFactory.selectFrom(member).where(member.age.eq(JPAExpressions.select(sub.age.max()).from(sub))).fetch();
 
@@ -271,9 +280,9 @@ public class MemberQuerydslTest {
     }
 
     @Test
-    public void subQuery2() throws Exception{
+    public void subQuery2() throws Exception {
         //given
-        int avg = (10 + 22 + 27 + 33)/4;
+        int avg = (10 + 22 + 27 + 33) / 4;
         QMember sub = new QMember("sub");
         //when
         List<Member> avgAgeGtMembers = queryFactory.selectFrom(member).where(member.age.gt(JPAExpressions.select(sub.age.avg()).from(sub))).fetch();
@@ -282,11 +291,11 @@ public class MemberQuerydslTest {
         for (Member avgAgeGtMember : avgAgeGtMembers) {
             System.out.println("avgAgeGtMember = " + avgAgeGtMember);
         }
-        assertThat(avgAgeGtMembers).extracting("username").containsExactly("W","D");
+        assertThat(avgAgeGtMembers).extracting("username").containsExactly("W", "D");
     }
 
     @Test
-    public void suqQuery3() throws Exception{
+    public void suqQuery3() throws Exception {
         //given
         QMember sub = new QMember("sub");
         //when
@@ -305,7 +314,7 @@ public class MemberQuerydslTest {
     }
 
     @Test
-    public void subQuery4() throws Exception{
+    public void subQuery4() throws Exception {
         //given
         QMember sub = new QMember("sub");
         //when
@@ -315,7 +324,110 @@ public class MemberQuerydslTest {
         for (Member gt10Member : gt10Members) {
             System.out.println("gt10Member = " + gt10Member);
         }
-        assertThat(gt10Members).extracting("age").containsExactly(27,22,33);
+        assertThat(gt10Members).extracting("age").containsExactly(27, 22, 33);
+    }
+
+    @Test
+    public void ProjectionResult() {
+        //given
+
+        //when
+        List<String> userName = queryFactory.select(member.username)
+                .from(member)
+                .fetch();
+
+        List<Tuple> name_age = queryFactory.select(member.username, member.age).from(member).fetch();
+
+        //then
+
+        userName.forEach(System.out::println);
+        System.out.println("=======");
+        name_age.forEach(System.out::println);
+    }
+
+    @Test
+    public void toDto() {
+        //given
+
+        //when
+        List<MemberResponseDto> resultList = em.createQuery("select new study.querydsl.controller.responseDto" +
+                ".MemberResponseDto(m.username,m.age) from Member m", MemberResponseDto.class)
+                .getResultList();
+        //then
+        resultList.forEach(System.out::println);
+    }
+
+    @Test
+    public void toDto2() {
+        //given
+        QMember sub = new QMember("sun");
+        //when
+        List<MemberResponseDto> memberDtos = queryFactory.select(Projections.constructor(MemberResponseDto.class,
+                member.username.as("name"), ExpressionUtils.as(
+                        JPAExpressions.select(sub.age.max()).from(sub), "age"))
+        ).from(member).fetch();
+        //then
+
+        memberDtos.forEach(System.out::println);
+    }
+
+    @Test
+    public void toDto3()
+    {
+        //given
+
+        //when
+        List<MemberResponseDto> memberDtos = queryFactory.select(new QMemberResponseDto(member.username, member.age))
+                .from(member).fetch();
+        //then
+        memberDtos.forEach(System.out::println);
+    }
+
+
+    @Test
+    public void DynamicQuery_BooleanBuilder()
+    {
+        //given
+        String username=null;
+        Integer age=null;
+
+        String username2="N";
+        Integer age2=10;
+
+        String username3="N";
+        Integer age3=null;
+
+
+        //when
+        List<Member> members = ConditionSearchMember(username,age);
+        List<MemberResponseDto> mappedDto = members.stream().map(Member::toDto).collect(Collectors.toList());
+
+        List<Member> members2 = ConditionSearchMember(username2,age2);
+
+        List<Member> members3 = ConditionSearchMember(username3,age3);
+
+
+        //then
+        assertThat(mappedDto.size()).isEqualTo(4);
+        assertThat(members2.size()).isEqualTo(0);
+        assertThat(members3.size()).isEqualTo(1);
+    }
+
+    private List<Member> ConditionSearchMember(String username,Integer age)
+    {
+        BooleanBuilder builder=new BooleanBuilder();
+        System.out.println("MemberQuerydslTest.ConditionSearchMember@@@@@@@@@@@@@@@@");
+        System.out.println("username = " + username + ", age = " + age);;
+        if(username!=null)
+        {
+            builder.and(member.username.eq(username));
+        }
+        if(age!=null)
+        {
+            builder.and(member.age.eq(age));
+        }
+
+        return queryFactory.selectFrom(member).where(builder).fetch();
     }
 
 }
