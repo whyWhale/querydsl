@@ -7,6 +7,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -15,6 +16,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.controller.responseDto.MemberResponseDto;
 import study.querydsl.controller.responseDto.QMemberResponseDto;
@@ -332,7 +334,7 @@ public class MemberQuerydslTest {
 
 
     @Test
-    public void Case() throws Exception{
+    public void Case() throws Exception {
         //given
 
         //when
@@ -341,13 +343,13 @@ public class MemberQuerydslTest {
                 .otherwise("성인")).from(member).fetch();
         //then
         assertThat(CaseMembers.get(0)).isEqualTo("미성년자");
-        for (int i =1; i < 4; i++) {
+        for (int i = 1; i < 4; i++) {
             assertThat(CaseMembers.get(i)).isEqualTo("성인");
         }
     }
 
     @Test
-    public void Case2() throws Exception{
+    public void Case2() throws Exception {
         //given
 
         //when
@@ -367,7 +369,7 @@ public class MemberQuerydslTest {
     }
 
     @Test
-    public void Constant() throws Exception{
+    public void Constant() throws Exception {
         //given
 
         //when
@@ -428,8 +430,7 @@ public class MemberQuerydslTest {
     }
 
     @Test
-    public void toDto3()
-    {
+    public void toDto3() {
         //given
 
         //when
@@ -441,26 +442,25 @@ public class MemberQuerydslTest {
 
 
     @Test
-    public void DynamicQuery_BooleanBuilder()
-    {
+    public void DynamicQuery_BooleanBuilder() {
         //given
-        String username=null;
-        Integer age=null;
+        String username = null;
+        Integer age = null;
 
-        String username2="N";
-        Integer age2=10;
+        String username2 = "N";
+        Integer age2 = 10;
 
-        String username3="N";
-        Integer age3=null;
+        String username3 = "N";
+        Integer age3 = null;
 
 
         //when
-        List<Member> members = ConditionSearchMember(username,age);
+        List<Member> members = ConditionSearchMember(username, age);
         List<MemberResponseDto> mappedDto = members.stream().map(Member::toDto).collect(Collectors.toList());
 
-        List<Member> members2 = ConditionSearchMember(username2,age2);
+        List<Member> members2 = ConditionSearchMember(username2, age2);
 
-        List<Member> members3 = ConditionSearchMember(username3,age3);
+        List<Member> members3 = ConditionSearchMember(username3, age3);
 
 
         //then
@@ -469,21 +469,100 @@ public class MemberQuerydslTest {
         assertThat(members3.size()).isEqualTo(1);
     }
 
-    private List<Member> ConditionSearchMember(String username,Integer age)
-    {
-        BooleanBuilder builder=new BooleanBuilder();
-        System.out.println("MemberQuerydslTest.ConditionSearchMember@@@@@@@@@@@@@@@@");
-        System.out.println("username = " + username + ", age = " + age);;
-        if(username!=null)
-        {
+    private List<Member> ConditionSearchMember(String username, Integer age) {
+        BooleanBuilder builder = new BooleanBuilder();
+        System.out.println("username = " + username + ", age = " + age);
+        ;
+        if (username != null) {
             builder.and(member.username.eq(username));
         }
-        if(age!=null)
-        {
+        if (age != null) {
             builder.and(member.age.eq(age));
         }
 
         return queryFactory.selectFrom(member).where(builder).fetch();
     }
+
+    @Test
+    public void WhereMultipleParameter() throws Exception {
+        //given
+        String username = "Q";
+        Integer age = null;
+        //when
+        List<Member> members = queryFactory.selectFrom(member).where(usernameEq(username),(ageEq(age))).fetch();
+
+        //then
+        assertThat(members.get(0).getUsername()).isEqualTo("Q");
+        assertThat(members.size()).isEqualTo(1);
+        members.forEach(System.out::println);
+    }
+
+    private BooleanExpression usernameEq(String username) {
+        return username != null ? member.username.eq(username) : null;
+    }
+
+    private BooleanExpression ageEq(Integer age) {
+        return age != null ? member.age.eq(age) : null;
+    }
+
+    @Test
+    @Commit
+    public void BulkUpdate() throws Exception{
+        //given
+        long cnt = queryFactory.update(member).set(member.username,"미성년자")
+                .where(member.age.lt(20)).execute();
+        em.flush();
+        em.clear();
+        //when   REAPEATABLE READ 발생 em.flush() ,em.clear()
+        List<Member> members = queryFactory.selectFrom(member).fetch();
+
+        System.out.println("cnt : "+cnt);
+        members.forEach(System.out::println);
+
+        //then
+    }
+
+
+    @Test
+    @Commit
+    public void BulkUpdate2() throws Exception{
+        //given
+
+        //when
+        long cnt = queryFactory.update(member).set(member.age, member.age.add(-5)).execute();
+        em.flush(); em.clear();
+
+        //then
+        List<Member> members = queryFactory.selectFrom(member).fetch();
+        System.out.println("cnt : "+cnt);
+        members.forEach(System.out::println);
+    }
+
+    @Test
+    public void funcCall() throws Exception{
+        //given
+
+        //when
+        List<String> members = queryFactory.select(Expressions.stringTemplate("function('replace' ,{0},{1},{2})"
+                , member.username, "Q", "M")).from(member).fetch();
+        //then
+        members.forEach(System.out::println);
+    }
+    @Test
+    public void funcCall2() throws Exception{
+        //given
+
+        //when
+        List<String> membersUserName = queryFactory.select(member.username)
+                .from(member)
+//                .where(member.username.eq(Expressions.stringTemplate(
+//                        "function ('lower',{0} )", member.username)))
+                .where(member.username.eq(member.username.lower()))
+                .fetch();
+        //then
+        membersUserName.forEach(System.out::println);
+    }
+
+
 
 }
