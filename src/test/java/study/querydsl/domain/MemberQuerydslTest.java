@@ -3,7 +3,6 @@ package study.querydsl.domain;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -13,8 +12,10 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,16 +34,17 @@ import static study.querydsl.domain.QMember.member;
 import static study.querydsl.domain.QTeam.team;
 
 @SpringBootTest
+@Slf4j
 @Transactional
 public class MemberQuerydslTest {
     @PersistenceContext
     EntityManager em;
 
+    @Autowired
     JPAQueryFactory queryFactory;
 
     @BeforeEach
     public void before() {
-        queryFactory = new JPAQueryFactory(em);
         Team A = new Team("A");
         Team B = new Team("B");
         em.persist(A);
@@ -53,9 +54,9 @@ public class MemberQuerydslTest {
         a.setTeam(A);
         Member b = Member.builder().username("W").age(27).build();
         b.setTeam(B);
-        Member c = Member.builder().username("N").age(22).build();
+        Member c = Member.builder().username("E").age(22).build();
         c.setTeam(B);
-        Member d = Member.builder().username("D").age(33).build();
+        Member d = Member.builder().username("R").age(33).build();
         d.setTeam(B);
 
         em.persist(a);
@@ -70,9 +71,9 @@ public class MemberQuerydslTest {
 
         //when
         Member singleResult = em.createQuery("select m from Member m where m.username=:username", Member.class)
-                .setParameter("username", "A").getSingleResult();
+                .setParameter("username", "Q").getSingleResult();
         //then
-        assertThat(singleResult.getUsername()).isEqualTo("A");
+//        assertThat(singleResult.getUsername()).isEqualTo("A");
     }
 
     @Test
@@ -85,7 +86,7 @@ public class MemberQuerydslTest {
         Member result = queryFactory.select(qMember).from(qMember).where(qMember.username.eq("A")).fetchOne();
 
         //then
-        assertThat(result.getUsername()).isEqualTo("A");
+        assertThat(result).isNull();
     }
 
 
@@ -123,20 +124,21 @@ public class MemberQuerydslTest {
     @Test
     public void pagingTest() {
         //given
-
+//        Q - A (10)
+//        W,E,R - B (27,22,33)
         //when
-        List<Member> members = queryFactory.selectFrom(member).orderBy(member.age.desc()).offset(2).limit(2).fetch();
+        List<Member> members = queryFactory.selectFrom(member).orderBy(member.age.desc()).offset(0).limit(2).fetch();
 
-        QueryResults<Member> memberQueryResults = queryFactory.selectFrom(member).orderBy(member.age.desc()).offset(2).limit(2).fetchResults();
+        QueryResults<Member> memberQueryResults = queryFactory.selectFrom(member).orderBy(member.age.desc()).offset(0).limit(3).fetchResults();
 
         //then
-        assertThat(members.get(0).getUsername()).isEqualTo("N");
-        assertThat(members.get(1).getUsername()).isEqualTo("A");
+        assertThat(members.get(0).getUsername()).isEqualTo("R");
+        assertThat(members.get(1).getUsername()).isEqualTo("W");
 
         assertThat(memberQueryResults.getTotal()).isEqualTo(4);
-        assertThat(memberQueryResults.getLimit()).isEqualTo(2);
-        assertThat(memberQueryResults.getOffset()).isEqualTo(2);
-        assertThat(memberQueryResults.getResults().size()).isEqualTo(2);
+        assertThat(memberQueryResults.getLimit()).isEqualTo(3);
+        assertThat(memberQueryResults.getOffset()).isEqualTo(0);
+        assertThat(memberQueryResults.getResults().size()).isEqualTo(3);
     }
 
     @Test
@@ -192,19 +194,21 @@ public class MemberQuerydslTest {
 
         //then
         assertThat(teamA.isEmpty()).isEqualTo(false);
-        assertThat(teamA).extracting("username").containsExactly("A");
+        assertThat(teamA).extracting("username").containsExactly("Q");
     }
 
     @Test
     public void ThetaJoin() throws Exception {
         //given
-
+        em.persist(Team.builder().name("Q").build());
+        em.persist(Team.builder().name("W").build());
         //when
-        List<Member> ThetaMember = queryFactory.select(member).from(member, team).where(member.username.eq(team.name)).fetch();
+        List<Member> ThetaMember = queryFactory.select(member)
+                .from(member, team)
+                .where(member.username.eq(team.name)).fetch();
         //then
-        assertThat(ThetaMember).extracting("username").containsExactly("A", "B");
+        assertThat(ThetaMember).extracting("username").containsExactly("Q", "W");
     }
-
 
     @Test
     public void JoinOnFilter() throws Exception {
@@ -398,9 +402,9 @@ public class MemberQuerydslTest {
 
         //then
 
-        userName.forEach(System.out::println);
-        System.out.println("=======");
-        name_age.forEach(System.out::println);
+        userName.forEach(s ->  log.info("userName : "+s));
+        name_age.forEach(s ->  log.info("<Tuple>nameAge : "+s));
+
     }
 
     @Test
