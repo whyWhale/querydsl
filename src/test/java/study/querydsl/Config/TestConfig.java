@@ -9,7 +9,7 @@ import javax.persistence.PersistenceContext;
 
 @TestConfiguration
 public class TestConfig{
-    // ref https://jyami.tistory.com/124
+
     @PersistenceContext
     private EntityManager em;
 
