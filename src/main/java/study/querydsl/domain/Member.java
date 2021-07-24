@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"team"})
 @Entity
-public class Member {
+public class Member extends BaseEntity{
     @Id
     @GeneratedValue
     @Column(name = "member_id")
@@ -43,7 +43,7 @@ public class Member {
 
     public MemberResponseDto toDto()
     {
-        return new MemberResponseDto(username,age);
+        return new MemberResponseDto(id,username,age,getCreatedDate());
     }
 
 }

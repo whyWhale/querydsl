@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"memberList"})
 @Entity
-public class Team {
+public class Team extends BaseEntity{
 
     @Id
     @GeneratedValue
