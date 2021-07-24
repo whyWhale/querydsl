@@ -130,7 +130,6 @@ public class MemberQuerydslTest {
         List<Member> members = queryFactory.selectFrom(member).orderBy(member.age.desc()).offset(0).limit(2).fetch();
 
         QueryResults<Member> memberQueryResults = queryFactory.selectFrom(member).orderBy(member.age.desc()).offset(0).limit(3).fetchResults();
-
         //then
         assertThat(members.get(0).getUsername()).isEqualTo("R");
         assertThat(members.get(1).getUsername()).isEqualTo("W");
@@ -189,7 +188,7 @@ public class MemberQuerydslTest {
         //given
 
         //when
-        List<Member> teamA = queryFactory.selectFrom(member).join(member.team, team).where(team.name.eq("A"))
+        List<Member> teamA = queryFactory.selectFrom(member).join(member.team, team).where(team.name.eq("A")) // 내부 조인.
                 .fetch();
 
         //then
@@ -239,9 +238,9 @@ public class MemberQuerydslTest {
                 .leftJoin(team).on(member.username.eq(team.name)).fetch();
         //then
         assertThat(tuples.size()).isEqualTo(6);
-       /* for (Tuple tuple : tuples) {
-            System.out.println(tuple.get(member)+"  "+tuple.get(team));
-        }*/
+        for (Tuple tuple : tuples) {
+          log.info(tuple.get(member)+"  "+tuple.get(team));
+        }
     }
 
     @PersistenceUnit
@@ -256,7 +255,7 @@ public class MemberQuerydslTest {
         //when
         List<Member> data = queryFactory.selectFrom(member).where(member.username.eq("Q")).fetch();
         //then
-        System.out.println(data.get(0));
+        log.info("data -> {}",data.get(0));
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(data.get(0).getTeam());
         assertThat(loaded).as("일반 적 조회(페치조인 x)").isFalse();
 
@@ -300,7 +299,7 @@ public class MemberQuerydslTest {
         for (Member avgAgeGtMember : avgAgeGtMembers) {
             System.out.println("avgAgeGtMember = " + avgAgeGtMember);
         }
-        assertThat(avgAgeGtMembers).extracting("username").containsExactly("W", "D");
+        assertThat(avgAgeGtMembers).extracting("username").containsExactly("W", "R");
     }
 
     @Test
@@ -454,7 +453,7 @@ public class MemberQuerydslTest {
         String username2 = "N";
         Integer age2 = 10;
 
-        String username3 = "N";
+        String username3 = "R";
         Integer age3 = null;
 
 
@@ -510,7 +509,7 @@ public class MemberQuerydslTest {
     }
 
     @Test
-    @Commit
+//    @Commit
     public void BulkUpdate() throws Exception{
         //given
         long cnt = queryFactory.update(member).set(member.username,"미성년자")
@@ -520,7 +519,6 @@ public class MemberQuerydslTest {
         //when   REAPEATABLE READ 발생 em.flush() ,em.clear()
         List<Member> members = queryFactory.selectFrom(member).fetch();
 
-        System.out.println("cnt : "+cnt);
         members.forEach(System.out::println);
 
         //then
@@ -528,7 +526,7 @@ public class MemberQuerydslTest {
 
 
     @Test
-    @Commit
+//    @Commit
     public void BulkUpdate2() throws Exception{
         //given
 
@@ -538,7 +536,7 @@ public class MemberQuerydslTest {
 
         //then
         List<Member> members = queryFactory.selectFrom(member).fetch();
-        System.out.println("cnt : "+cnt);
+//        System.out.println("cnt : "+cnt);
         members.forEach(System.out::println);
     }
 
