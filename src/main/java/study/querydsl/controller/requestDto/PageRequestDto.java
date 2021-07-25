@@ -18,12 +18,17 @@ public class PageRequestDto {
 
     @Builder
     public PageRequestDto(Integer page, Integer size) {
-            this.page=1;
-            this.size=10;
+        if ((page == null || page<1) || (size == null|| size<1)) {
+            this.page = 1;
+            this.size = 10;
+        } else {
+
+            this.page=page;
+            this.size=size;
+        }
     }
 
-    public Pageable getPageable(Sort sort)
-    {
-        return PageRequest.of(page-1,size,sort);
+    public Pageable getPageable(Sort sort) {
+        return PageRequest.of(page - 1, size, sort);
     }
 }
