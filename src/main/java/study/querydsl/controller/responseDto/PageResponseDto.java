@@ -52,8 +52,7 @@ public class PageResponseDto<DTO,ENTITY>{
     {
         dtoList= entities.getResults();
 
-        totalPage=  entities.getTotal();
-
+        totalPage=  entities.getTotal()/entities.getLimit();
         this.page= (entities.getOffset()/entities.getLimit()+1);
         this.size=  entities.getLimit();
 
@@ -61,7 +60,6 @@ public class PageResponseDto<DTO,ENTITY>{
         start=tempEnd-9;
 
         prev=start>1;
-
         end= totalPage>tempEnd ? tempEnd: (int) totalPage;
 
         next=totalPage>tempEnd;
