@@ -2,6 +2,7 @@ package study.querydsl.domain;
 
 import lombok.*;
 import study.querydsl.controller.responseDto.MemberResponseDto;
+import study.querydsl.controller.responseDto.MemberTeamResponseDto;
 
 import javax.persistence.*;
 import java.util.List;
@@ -44,6 +45,18 @@ public class Member extends BaseEntity{
     public MemberResponseDto toDto()
     {
         return new MemberResponseDto(id,username,age,getCreatedDate());
+    }
+
+    public MemberTeamResponseDto toDto2()
+    {
+        return MemberTeamResponseDto.builder()
+                .memberId(this.id)
+                .teamId(this.team.getId())
+                .teamName(this.team.getName())
+                .age(this.age)
+                .username(this.username)
+                .build();
+
     }
 
 }
