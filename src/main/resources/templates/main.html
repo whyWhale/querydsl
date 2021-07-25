@@ -6,8 +6,55 @@
 
     <th:block th:fragment="content">
 
-        <h1>Main Content Page</h1>
+            <h1>Main Content Page</h1>
 
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">username</th>
+                <th scope="col">age</th>
+                <th scope="col">teamId</th>
+                <th scope="col">teamName</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr th:each="dto : ${result.dtoList}" >
+                <th scope="row">
+                        [[${dto.memberId}]]
+                </th>
+                <td>[[${dto.username}]]</td>
+                <td>[[${dto.age}]]</td>
+                <td>[[${dto.teamId}]]</td>
+                <td>[[${dto.teamName}]]</td>
+            </tr>
+
+            </tbody>
+        </table>
+        <ul class="pagination h-100 justify-content-center align-items-center">
+
+            <li class="page-item " th:if="${result.prev}">
+                <a class="page-link"
+                   th:href="@{/main(page= ${result.start -1})}"
+                   tabindex="-1">Previous</a>
+            </li>
+
+            <li th:class=" 'page-item ' + ${result.page == page?'active':''} " th:each="page: ${result.pageList}">
+                <a class="page-link"
+                   th:href="@{/main(page = ${page},size=${10})}">
+                    [[${page}]]
+                </a>
+            </li>
+
+            <li class="page-item" th:if="${result.next}">
+                <a class="page-link" th:href="@{/main(page= ${result.end + 1})}">
+                    Next
+                </a>
+            </li>
+
+        </ul>
     </th:block>
+
 
 </th:block>
