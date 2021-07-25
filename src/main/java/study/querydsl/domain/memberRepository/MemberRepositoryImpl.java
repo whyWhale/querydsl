@@ -77,16 +77,16 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .leftJoin(member.team, team).where(
                         usernameEq(memberSearchCondition.getUsername()),
                         teamNameEq(memberSearchCondition.getTeamName()),
-                       betweenAge(memberSearchCondition.getAgeLoe(), memberSearchCondition.getAgeGoe())
+                       betweenAge(memberSearchCondition.getAgeGoe(),memberSearchCondition.getAgeLoe())
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetchResults();
     }
 
-    private BooleanExpression betweenAge(Integer loe,Integer goe)
-    {
-        return ageGoe(goe).and(ageLoe(loe));
+    private BooleanBuilder betweenAge(Integer ageGoe, Integer ageLoe) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        return booleanBuilder.and(ageGoe(ageGoe)).and(ageLoe(ageLoe));
     }
 
     private BooleanExpression usernameEq(String username) {
