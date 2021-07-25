@@ -11,20 +11,20 @@ import java.time.format.DateTimeFormatter;
 @Getter
 public class MemberResponseDto {
     private Long id;
-    private String name;
+    private String username;
     private int age;
     private String createdDate;
 
     @QueryProjection
-    public MemberResponseDto(String name, int age) {
-        this.name = name;
+    public MemberResponseDto(String username, int age) {
+        this.username = username;
         this.age = age;
     }
 
     @Builder
-    public MemberResponseDto(Long id,String name, int age, LocalDateTime createdDate) {
+    public MemberResponseDto(Long id, String username, int age, LocalDateTime createdDate) {
         this.id=id;
-        this.name = name;
+        this.username = username;
         this.age = age;
         this.createdDate = formatDate(createdDate);
     }
