@@ -73,7 +73,7 @@ public class MemberQuerydslTest {
         Member singleResult = em.createQuery("select m from Member m where m.username=:username", Member.class)
                 .setParameter("username", "Q").getSingleResult();
         //then
-//        assertThat(singleResult.getUsername()).isEqualTo("A");
+        assertThat(singleResult.getUsername()).isEqualTo("Q");
     }
 
     @Test
