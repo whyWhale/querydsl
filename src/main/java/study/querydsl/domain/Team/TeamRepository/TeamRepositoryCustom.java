@@ -1,6 +1,6 @@
-package study.querydsl.domain.TeamRepository;
+package study.querydsl.domain.Team.TeamRepository;
 
-import study.querydsl.domain.Team;
+import study.querydsl.domain.Team.Team;
 
 import java.util.Optional;
 

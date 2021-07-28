@@ -12,8 +12,8 @@ import study.querydsl.controller.requestDto.PageRequestDto;
 import study.querydsl.controller.responseDto.MemberResponseDto;
 import study.querydsl.controller.responseDto.MemberTeamResponseDto;
 import study.querydsl.controller.responseDto.PageResponseDto;
-import study.querydsl.domain.Member;
-import study.querydsl.domain.memberRepository.MemberRepository;
+import study.querydsl.domain.Member.Member;
+import study.querydsl.domain.Member.memberRepository.MemberRepository;
 
 import java.util.function.Function;
 

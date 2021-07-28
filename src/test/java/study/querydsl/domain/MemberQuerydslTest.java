@@ -17,10 +17,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.controller.responseDto.MemberResponseDto;
 import study.querydsl.controller.responseDto.QMemberResponseDto;
+import study.querydsl.domain.Member.Member;
+import study.querydsl.domain.Team.Team;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

@@ -1,6 +1,5 @@
 package study.querydsl.controller;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -22,7 +21,7 @@ public class MemberController {
     {
       log.info("requestDto >>>> "+requestDto);
 
-      model.addAttribute("result",memberService.getPagingList(requestDto));
+      model.addAttribute("result",memberService.memberList(requestDto));
       return "list";
     }
 }

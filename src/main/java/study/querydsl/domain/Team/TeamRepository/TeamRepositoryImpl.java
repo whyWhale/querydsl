@@ -1,15 +1,11 @@
-package study.querydsl.domain.TeamRepository;
+package study.querydsl.domain.Team.TeamRepository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import study.querydsl.domain.QTeam;
-import study.querydsl.domain.Team;
+import study.querydsl.domain.Team.Team;
 
-import java.util.List;
 import java.util.Optional;
-
-import static study.querydsl.domain.QTeam.*;
-import static study.querydsl.domain.QTeam.team;
 
 @RequiredArgsConstructor
 public class TeamRepositoryImpl implements TeamRepositoryCustom {

@@ -4,14 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import study.querydsl.domain.Member;
-import study.querydsl.domain.Team;
-import study.querydsl.domain.TeamRepository.TeamRepository;
-import study.querydsl.domain.TeamRepository.TeamRepositoryCustom;
+import study.querydsl.domain.Member.Member;
+import study.querydsl.domain.Team.Team;
+import study.querydsl.domain.Team.TeamRepository.TeamRepository;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 @Profile("local")
 @Component

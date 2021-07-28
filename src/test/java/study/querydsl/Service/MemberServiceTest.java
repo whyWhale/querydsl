@@ -14,13 +14,12 @@ import study.querydsl.controller.requestDto.PageRequestDto;
 import study.querydsl.controller.responseDto.MemberResponseDto;
 import study.querydsl.controller.responseDto.MemberTeamResponseDto;
 import study.querydsl.controller.responseDto.PageResponseDto;
-import study.querydsl.domain.Member;
-import study.querydsl.domain.Team;
-import study.querydsl.domain.memberRepository.MemberRepository;
+import study.querydsl.domain.Member.Member;
+import study.querydsl.domain.Team.Team;
+import study.querydsl.domain.Member.memberRepository.MemberRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
 import java.util.stream.IntStream;
 
 @RunWith(SpringRunner.class)

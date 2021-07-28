@@ -10,7 +10,7 @@ import study.querydsl.controller.requestDto.MemberSearchCondition;
 import study.querydsl.controller.requestDto.PageRequestDto;
 import study.querydsl.controller.responseDto.MemberTeamResponseDto;
 import study.querydsl.controller.responseDto.PageResponseDto;
-import study.querydsl.domain.Member;
+import study.querydsl.domain.Member.Member;
 
 @Slf4j
 @RequiredArgsConstructor

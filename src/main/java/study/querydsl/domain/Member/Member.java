@@ -1,17 +1,18 @@
-package study.querydsl.domain;
+package study.querydsl.domain.Member;
 
 import lombok.*;
 import study.querydsl.controller.responseDto.MemberResponseDto;
 import study.querydsl.controller.responseDto.MemberTeamResponseDto;
+import study.querydsl.domain.BaseEntity;
+import study.querydsl.domain.Team.Team;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"team"})
 @Entity
-public class Member extends BaseEntity{
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue
     @Column(name = "member_id")

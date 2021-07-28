@@ -1,7 +1,8 @@
-package study.querydsl.domain;
+package study.querydsl.domain.Team;
 
 import lombok.*;
-import org.apache.catalina.LifecycleState;
+import study.querydsl.domain.BaseEntity;
+import study.querydsl.domain.Member.Member;
 
 import javax.persistence.*;
 import java.util.LinkedList;
@@ -11,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"memberList"})
 @Entity
-public class Team extends BaseEntity{
+public class Team extends BaseEntity {
 
     @Id
     @GeneratedValue
