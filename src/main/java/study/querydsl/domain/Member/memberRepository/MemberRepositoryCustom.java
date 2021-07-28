@@ -19,4 +19,8 @@ public interface MemberRepositoryCustom {
 
     Page<MemberTeamResponseDto> searchByConditions(Pageable pageable, MemberSearchCondition memberSearchCondition);
 
+    Page<MemberTeamResponseDto> pagingCntImprove(Pageable pageable, MemberSearchCondition memberSearchCondition);
+
+
+
 }

@@ -37,5 +37,13 @@ public class MemberService {
         return new PageResponseDto<>(memberTeamResponseDtos);
     }
 
+    public PageResponseDto<MemberTeamResponseDto, Member> pagingCntImprove
+            (PageRequestDto requestDto, MemberSearchCondition memberSearchCondition) {
+        Pageable pageable=requestDto.getPageable(Sort.by("id"));
+
+        Page<MemberTeamResponseDto> memberTeamResponseDtos = memberRepository.pagingCntImprove(pageable, memberSearchCondition);
+        return new PageResponseDto<>(memberTeamResponseDtos);
+    }
+
 
 }

@@ -5,12 +5,14 @@ import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 import study.querydsl.controller.requestDto.MemberSearchCondition;
 import study.querydsl.controller.responseDto.MemberTeamResponseDto;
@@ -113,6 +115,33 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 ).offset(pageable.getOffset()).limit(pageable.getPageSize()).fetchCount();
 
         return new PageImpl<>(content,pageable,cnt);
+    }
+
+    @Override
+    public Page<MemberTeamResponseDto> pagingCntImprove(Pageable pageable, MemberSearchCondition memberSearchCondition) {
+        List<MemberTeamResponseDto> contents = jpaQueryFactory.select(Projections.constructor(MemberTeamResponseDto.class,
+                member.id,
+                member.username,
+                member.age,
+                team.id,
+                team.name
+        )).from(member)
+                .leftJoin(member.team, team)
+                .where(
+                        usernameEq(memberSearchCondition.getUsername()),
+                        teamNameEq(memberSearchCondition.getTeamName()),
+                        betweenAge(memberSearchCondition.getAgeGoe(), memberSearchCondition.getAgeLoe())
+                ).offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
+
+        JPAQuery<Member> cntQuery = jpaQueryFactory.select(member).from(member).leftJoin(member.team, team)
+                .where(
+                        usernameEq(memberSearchCondition.getUsername()),
+                        teamNameEq(memberSearchCondition.getTeamName()),
+                        betweenAge(memberSearchCondition.getAgeGoe(), memberSearchCondition.getAgeLoe())
+                );
+
+
+        return PageableExecutionUtils.getPage(contents, pageable, cntQuery::fetchCount);
     }
 
     private BooleanBuilder betweenAge(Integer ageGoe, Integer ageLoe) {
