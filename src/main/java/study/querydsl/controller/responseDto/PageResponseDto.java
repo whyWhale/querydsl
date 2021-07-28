@@ -48,6 +48,26 @@ public class PageResponseDto<DTO,ENTITY>{
         pageList= IntStream.rangeClosed(start,end).boxed().collect(Collectors.toList());
     }
 
+
+    public PageResponseDto(Page<DTO> entities)
+    {
+        dtoList=entities.getContent();
+        totalPage= entities.getTotalPages();
+
+        Pageable pageable = entities.getPageable();
+        this.page=pageable.getPageNumber()+1;
+        this.size=pageable.getPageSize();
+
+        long tempEnd=(long)(Math.ceil(page/10.0))*10;
+        start=(int)tempEnd-9;
+
+        prev=start>1;
+
+        end= (int) (totalPage>tempEnd ? tempEnd:totalPage);
+
+        next=totalPage>tempEnd;
+        pageList= IntStream.rangeClosed(start,end).boxed().collect(Collectors.toList());
+    }
     public PageResponseDto(QueryResults<DTO> entities)
     {
         dtoList= entities.getResults();
