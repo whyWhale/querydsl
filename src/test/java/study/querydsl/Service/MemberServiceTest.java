@@ -20,6 +20,7 @@ import study.querydsl.domain.Member.memberRepository.MemberRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 import java.util.stream.IntStream;
 
 @RunWith(SpringRunner.class)
@@ -75,7 +76,10 @@ public class MemberServiceTest {
         // when
         PageResponseDto<MemberTeamResponseDto, Member> memberTeamResponseDtos = memberService.memberSearchConditionList(pageRequestDto, memberSearchCondition);
 
-        log.info("paging Dtos  -> "+ memberTeamResponseDtos.toString());
         // then
+
+        List<MemberTeamResponseDto> dtoList = memberTeamResponseDtos.getDtoList();
+        Assertions.assertThat(dtoList).extracting("username").containsExactly("21","22","23","24","25");
+        log.info("paging Dtos  -> "+ memberTeamResponseDtos.toString());
     }
 }

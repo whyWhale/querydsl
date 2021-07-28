@@ -9,18 +9,18 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 import study.querydsl.Config.TestConfig;
 import study.querydsl.controller.requestDto.MemberSearchCondition;
 import study.querydsl.controller.responseDto.MemberTeamResponseDto;
-import study.querydsl.domain.Member;
-import study.querydsl.domain.Team;
-import study.querydsl.domain.memberRepository.MemberRepository;
+import study.querydsl.domain.Member.Member;
+import study.querydsl.domain.Team.Team;
+import study.querydsl.domain.Member.memberRepository.MemberRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.awt.print.Pageable;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -119,6 +119,38 @@ public class UnitTest {
         Assertions.assertThat(memberTeamResponseDtoQueryResults2.getTotal()).isEqualTo(10);
         Assertions.assertThat(memberTeamResponseDtoQueryResults2.getResults())
                 .extracting("username").containsExactly("10","12","14","16","18");
+
+    }
+
+
+    @Test
+    public void SearchTest3(){
+        // given
+        MemberSearchCondition memberSearchCondition = MemberSearchCondition.builder().teamName("B").build();
+
+        // when
+        PageRequest pageRequest1 = PageRequest.of(0, 50); // 첫 페이지
+        PageRequest pageRequest2 = PageRequest.of(2, 3); // offset 0 3 6  -> 중간 페이지
+        PageRequest pageRequest3 = PageRequest.of(9, 1);  // 1 3 5 7 9 11 13 15 17 19  -> 마지막 페이지
+
+        // then
+        Page<MemberTeamResponseDto> memberTeamResponseDtos = memberRepository.searchByConditions(pageRequest1, memberSearchCondition);
+        List<MemberTeamResponseDto> content = memberTeamResponseDtos.getContent();
+        content.forEach(memberTeamResponseDto -> log.info("memberSearchCondition 1-> "+memberTeamResponseDto));
+        Assertions.assertThat(content.size()).isEqualTo(10); // 1 3 5 7 9 11 13 15 17 19
+
+
+        Page<MemberTeamResponseDto> memberTeamResponseDtos2 = memberRepository.searchByConditions(pageRequest2, memberSearchCondition);
+        List<MemberTeamResponseDto> content2 = memberTeamResponseDtos2.getContent();
+        content2.forEach(memberTeamResponseDto -> log.info("memberSearchCondition 2-> "+memberTeamResponseDto));
+        Assertions.assertThat(content2).extracting("username").containsExactly("13","15","17");
+
+
+        Page<MemberTeamResponseDto> memberTeamResponseDtos3 = memberRepository.searchByConditions(pageRequest3, memberSearchCondition);
+        List<MemberTeamResponseDto> content3 = memberTeamResponseDtos3.getContent();
+        content3.forEach(memberTeamResponseDto -> log.info("memberSearchCondition 3-> "+memberTeamResponseDto));
+        Assertions.assertThat(content3).extracting("username").containsExactly("19");
+
 
 
     }
