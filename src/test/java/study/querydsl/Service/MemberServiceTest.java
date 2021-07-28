@@ -82,4 +82,26 @@ public class MemberServiceTest {
         Assertions.assertThat(dtoList).extracting("username").containsExactly("21","22","23","24","25");
         log.info("paging Dtos  -> "+ memberTeamResponseDtos.toString());
     }
+
+    @Test
+    public void pagingCntImprove(){
+        // given
+        PageRequestDto pageRequestDto1 = PageRequestDto.builder().page(1).size(50).build(); //  [26-50]
+        PageRequestDto pageRequestDto2 = PageRequestDto.builder().page(2).size(20).build(); //  [46-50]
+
+        MemberSearchCondition memberSearchCondition = MemberSearchCondition.builder()
+                .teamName("B").build();
+        // when
+        PageResponseDto<MemberTeamResponseDto, Member> responseDto1 = memberService.pagingCntImprove(pageRequestDto1, memberSearchCondition);
+        PageResponseDto<MemberTeamResponseDto, Member> responseDto2 = memberService.pagingCntImprove(pageRequestDto2, memberSearchCondition);
+        // then
+        responseDto1.getDtoList().forEach(memberTeamResponseDto -> log.info("memberTeamResponseDto -> "+memberTeamResponseDto));
+        Assertions.assertThat(responseDto1.getTotalPage()).isEqualTo(1L);  // not Cnt Query
+
+        log.info("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
+
+        responseDto2.getDtoList().forEach(memberTeamResponseDto -> log.info("memberTeamResponseDto2 -> "+memberTeamResponseDto));
+        Assertions.assertThat(responseDto2.getTotalPage()).isEqualTo(2L);   // not Cnt Query
+
+    }
 }

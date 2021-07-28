@@ -82,8 +82,8 @@ public class UnitTest {
     public void SearchTest2(){
         // given
         MemberSearchCondition memberSearchCondition = MemberSearchCondition.builder()
-                .username(null).teamName("A").ageGoe(5).ageLoe(15)
-                .build();
+                .username(null).teamName("A").ageGoe(5).ageLoe(15) // 6, 8 , 10, 12, 14
+                .build();                                   // offset-0, 1 ,  2,  3,  4
 
         MemberSearchCondition memberSearchCondition2 = MemberSearchCondition.builder()
                 .username(null).teamName("A").ageGoe(0)
@@ -98,9 +98,9 @@ public class UnitTest {
         memberTeamResponseDtoQueryResults.getResults().forEach(memberTeamResponseDto -> {
             log.info("memberTeamResponseDto -> "+memberTeamResponseDto);
         });
-        log.info("OFFSET -> "+memberTeamResponseDtoQueryResults.getOffset());
-        log.info("LIMIT  -> "+memberTeamResponseDtoQueryResults.getLimit());
-        log.info("TOTAL  -> "+memberTeamResponseDtoQueryResults.getTotal());
+        log.info("OFFSET -> "+memberTeamResponseDtoQueryResults.getOffset()); //2
+        log.info("LIMIT  -> "+memberTeamResponseDtoQueryResults.getLimit()); // 2
+        log.info("TOTAL  -> "+memberTeamResponseDtoQueryResults.getTotal()); // 5
 
         log.info("***************************************************************************");
         QueryResults<MemberTeamResponseDto> memberTeamResponseDtoQueryResults2 = memberRepository.searchByBuilderQueryResults(of2, memberSearchCondition2);
@@ -121,37 +121,64 @@ public class UnitTest {
                 .extracting("username").containsExactly("10","12","14","16","18");
 
     }
-
-
     @Test
     public void SearchTest3(){
         // given
         MemberSearchCondition memberSearchCondition = MemberSearchCondition.builder().teamName("B").build();
 
-        // when
         PageRequest pageRequest1 = PageRequest.of(0, 50); // 첫 페이지
         PageRequest pageRequest2 = PageRequest.of(2, 3); // offset 0 3 6  -> 중간 페이지
         PageRequest pageRequest3 = PageRequest.of(9, 1);  // 1 3 5 7 9 11 13 15 17 19  -> 마지막 페이지
 
-        // then
+        // when
         Page<MemberTeamResponseDto> memberTeamResponseDtos = memberRepository.searchByConditions(pageRequest1, memberSearchCondition);
+        Page<MemberTeamResponseDto> memberTeamResponseDtos2 = memberRepository.searchByConditions(pageRequest2, memberSearchCondition);
+        Page<MemberTeamResponseDto> memberTeamResponseDtos3 = memberRepository.searchByConditions(pageRequest3, memberSearchCondition);
+
+        // then
         List<MemberTeamResponseDto> content = memberTeamResponseDtos.getContent();
         content.forEach(memberTeamResponseDto -> log.info("memberSearchCondition 1-> "+memberTeamResponseDto));
         Assertions.assertThat(content.size()).isEqualTo(10); // 1 3 5 7 9 11 13 15 17 19
 
 
-        Page<MemberTeamResponseDto> memberTeamResponseDtos2 = memberRepository.searchByConditions(pageRequest2, memberSearchCondition);
         List<MemberTeamResponseDto> content2 = memberTeamResponseDtos2.getContent();
         content2.forEach(memberTeamResponseDto -> log.info("memberSearchCondition 2-> "+memberTeamResponseDto));
         Assertions.assertThat(content2).extracting("username").containsExactly("13","15","17");
 
 
-        Page<MemberTeamResponseDto> memberTeamResponseDtos3 = memberRepository.searchByConditions(pageRequest3, memberSearchCondition);
         List<MemberTeamResponseDto> content3 = memberTeamResponseDtos3.getContent();
         content3.forEach(memberTeamResponseDto -> log.info("memberSearchCondition 3-> "+memberTeamResponseDto));
         Assertions.assertThat(content3).extracting("username").containsExactly("19");
+    }
+    @Test
+    public void SearchTestImprove(){
+        // given
+        MemberSearchCondition memberSearchCondition = MemberSearchCondition.builder().teamName("B").build();
+
+        PageRequest pageRequest1 = PageRequest.of(0, 50); // 첫 페이지
+        PageRequest pageRequest2 = PageRequest.of(2, 3); // offset 0 3 6  -> 중간 페이지
+        PageRequest pageRequest3 = PageRequest.of(5, 2);  // 1 3 5 7 9 11 13 15 17 19  -> 마지막 페이지
+
+        // when
+        Page<MemberTeamResponseDto> memberTeamResponseDtos = memberRepository.pagingCntImprove(pageRequest1, memberSearchCondition);
+        Page<MemberTeamResponseDto> memberTeamResponseDtos2 = memberRepository.pagingCntImprove(pageRequest2, memberSearchCondition);
+        Page<MemberTeamResponseDto> memberTeamResponseDtos3 = memberRepository.pagingCntImprove(pageRequest3, memberSearchCondition);
+
+        // then
+        List<MemberTeamResponseDto> content = memberTeamResponseDtos.getContent();
+        content.forEach(memberTeamResponseDto -> log.info("memberSearchCondition 1-> "+memberTeamResponseDto));
+                // not Count Query
+        Assertions.assertThat(content.size()).isEqualTo(10); // 1 3 5 7 9 11 13 15 17 19
 
 
+        List<MemberTeamResponseDto> content2 = memberTeamResponseDtos2.getContent();
+        content2.forEach(memberTeamResponseDto -> log.info("memberSearchCondition 2-> "+memberTeamResponseDto));
+        Assertions.assertThat(content2).extracting("username").containsExactly("13","15","17");
 
+
+        List<MemberTeamResponseDto> content3 = memberTeamResponseDtos3.getContent();
+        content3.forEach(memberTeamResponseDto -> log.info("memberSearchCondition 3-> "+memberTeamResponseDto));
+        // not Count Query (마지막 페이지일때 offset+size= 전체 사이즈와 비교.
+        Assertions.assertThat(content3).extracting("username").containsExactly();
     }
 }
