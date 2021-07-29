@@ -1,6 +1,8 @@
 package study.querydsl.domain.Member;
 
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
+import study.querydsl.controller.requestDto.MemberUpdateRequestDto;
 import study.querydsl.controller.responseDto.MemberResponseDto;
 import study.querydsl.controller.responseDto.MemberTeamResponseDto;
 import study.querydsl.domain.BaseEntity;
@@ -10,6 +12,7 @@ import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicUpdate
 @ToString(exclude = {"team"})
 @Entity
 public class Member extends BaseEntity {
@@ -60,4 +63,8 @@ public class Member extends BaseEntity {
 
     }
 
+    public void update(MemberUpdateRequestDto memberUpdateRequestDto){
+        this.username=memberUpdateRequestDto.getUsername();
+        this.age=memberUpdateRequestDto.getAge();
+    }
 }

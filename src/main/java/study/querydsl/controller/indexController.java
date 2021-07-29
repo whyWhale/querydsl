@@ -20,7 +20,7 @@ public class indexController {
 
     private final MemberService memberService;
 
-    @GetMapping("main")
+    @GetMapping("/main")
     public void index(@ModelAttribute("PageRequestDto") PageRequestDto requestDto, Model model
             ,@ModelAttribute("MemberSearchCondition") MemberSearchCondition memberSearchCondition)
     {
@@ -31,6 +31,7 @@ public class indexController {
 
         model.addAttribute("result",dto);
     }
+
 
 }
 
