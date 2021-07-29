@@ -2,7 +2,7 @@ package study.querydsl.domain.Team.TeamRepository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import study.querydsl.domain.QTeam;
+import study.querydsl.domain.Team.QTeam;
 import study.querydsl.domain.Team.Team;
 
 import java.util.Optional;

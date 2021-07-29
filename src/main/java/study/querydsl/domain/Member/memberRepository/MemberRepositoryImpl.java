@@ -2,7 +2,6 @@ package study.querydsl.domain.Member.memberRepository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -11,27 +10,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 import study.querydsl.controller.requestDto.MemberSearchCondition;
 import study.querydsl.controller.responseDto.MemberTeamResponseDto;
 import study.querydsl.domain.Member.Member;
-import study.querydsl.domain.QMember;
+import study.querydsl.domain.Member.QMember;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.util.StringUtils.hasText;
-import static study.querydsl.domain.QMember.member;
-import static study.querydsl.domain.QTeam.team;
+import static study.querydsl.domain.Member.QMember.member;
+import static study.querydsl.domain.Team.QTeam.team;
 
 @RequiredArgsConstructor
 public class MemberRepositoryImpl implements MemberRepositoryCustom {
     private final EntityManager em;
     private final JPAQueryFactory jpaQueryFactory;
-
     @Override
     public Optional<Member> findByName(Long memberId) {
         Member member = jpaQueryFactory.selectFrom(QMember.member)
@@ -39,6 +36,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                 .fetchOne();
         return Optional.ofNullable(member);
     }
+
 
     @Override
     public List<MemberTeamResponseDto> searchByBuilder(Pageable pageable, MemberSearchCondition memberSearchCondition) {

@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.controller.responseDto.MemberResponseDto;
 import study.querydsl.controller.responseDto.QMemberResponseDto;
 import study.querydsl.domain.Member.Member;
+import study.querydsl.domain.Member.QMember;
+import study.querydsl.domain.Team.QTeam;
 import study.querydsl.domain.Team.Team;
 
 import javax.persistence.EntityManager;
@@ -31,8 +33,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static study.querydsl.domain.QMember.member;
-import static study.querydsl.domain.QTeam.team;
+import static study.querydsl.domain.Member.QMember.*;
+import static study.querydsl.domain.Team.QTeam.*;
 
 @SpringBootTest
 @Slf4j
