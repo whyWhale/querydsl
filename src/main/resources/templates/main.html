@@ -8,6 +8,20 @@
 
             <h1>Main Content Page</h1>
 
+        <form action="/main" method="get" id="searchForm">
+            <div class="input-group">
+                <input class="form-control" name="username" th:value="${MemberSearchCondition.username}" th:placeholder="멤버이름">
+                <input class="form-control" name="teamName" th:value="${MemberSearchCondition.teamName}" th:placeholder="팀이름">
+                <input class="form-control" name="ageGoe" th:value="${MemberSearchCondition.ageGoe}" th:placeholder="0살이상">
+                <input class="form-control" name="ageLoe" th:value="${MemberSearchCondition.ageLoe}" th:placeholder="100살이하">
+                <div class="input-group-append" id="button-addon4">
+                    <button class="btn btn-outline-secondary btn-search" type="button">Search</button>
+                    <button class="btn btn-outline-secondary btn-clear" type="button">Clear</button>
+                </div>
+            </div>
+        </form>
+
+
         <table class="table table-striped">
             <thead>
             <tr>
@@ -36,24 +50,59 @@
 
             <li class="page-item " th:if="${result.prev}">
                 <a class="page-link"
-                   th:href="@{/main(page= ${result.start -1})}"
+                   th:href="@{/main(page= ${result.start -1}
+                   ,size=${10},
+                   username=${MemberSearchCondition.username},
+                   teamName=${MemberSearchCondition.teamName},
+                   ageGoe=${MemberSearchCondition.ageGoe},
+                   ageLoe=${MemberSearchCondition.ageLoe}
+                   )}"
                    tabindex="-1">Previous</a>
             </li>
 
             <li th:class=" 'page-item ' + ${result.page == page?'active':''} " th:each="page: ${result.pageList}">
                 <a class="page-link"
-                   th:href="@{/main(page = ${page},size=${10})}">
+                   th:href="@{/main(page = ${page},size=${10},
+                   username=${MemberSearchCondition.username},
+                   teamName=${MemberSearchCondition.teamName},
+                   ageGoe=${MemberSearchCondition.ageGoe},
+                   ageLoe=${MemberSearchCondition.ageLoe}
+                   )}">
                     [[${page}]]
                 </a>
             </li>
 
             <li class="page-item" th:if="${result.next}">
-                <a class="page-link" th:href="@{/main(page= ${result.end + 1})}">
+                <a class="page-link" th:href="@{/main(page= ${result.end + 1}
+                ,size=${10},
+                   username=${MemberSearchCondition.username},
+                   teamName=${MemberSearchCondition.teamName},
+                   ageGoe=${MemberSearchCondition.ageGoe},
+                   ageLoe=${MemberSearchCondition.ageLoe}
+                )}">
                     Next
                 </a>
             </li>
 
         </ul>
+        <script th:inline="javascript">
+
+            var searchForm = $("#searchForm");
+
+            $('.btn-search').click(function(e){
+
+                searchForm.submit();
+
+            });
+
+            $('.btn-clear').click(function(e){
+
+                searchForm.empty().submit();
+
+            });
+
+
+        </script>
     </th:block>
 
 
