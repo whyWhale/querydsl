@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/fragments/layout :: setContent(~{this::content} )}">
+
+<th:block th:fragment="content">
+    <h1> member Create</h1>
+    <form action="/member" method="POST" id="searchForm">
+        <div class="input-group">
+            <input class="form-control" name="username" th:value="${memberSaveRequestDto.username}" th:placeholder="이름">
+            <input class="form-control" name="age" th:value="${memberSaveRequestDto.age}" th:placeholder="나이">
+            <div class="input-group-append" id="button-addon4">
+                <button class="btn btn-outline-secondary btn-create" type="button">등록</button>
+            </div>
+        </div>
+    </form>
+    <script th:inline="javascript">
+        $('.btn-create').click(function(e){
+            searchForm.submit();
+        });
+    </script>
+</th:block>
+</html>

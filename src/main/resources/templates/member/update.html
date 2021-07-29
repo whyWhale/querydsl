@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/fragments/layout::setContent(~{this::content})}">
+
+    <th:block th:fragment="content">
+        <form action="/member/update" method="post">
+        <div class="container-xl">
+            <div class="form-group">
+                <label ></label>
+                <input type="hidden" class="form-control" name="id" th:value="${memberResponseDto.id}" readonly >
+            </div>
+
+            <div class="form-group">
+                <label >username</label>
+                <input type="text" class="form-control" name="username" th:value="${memberResponseDto.username}"  >
+            </div>
+
+            <div class="form-group">
+                <label >age</label>
+                <input type="text" class="form-control" name="age" th:value="${memberResponseDto.age}"  >
+            </div>
+        </div>
+        </form>
+        <button type="button" class="btn btn-primary modifyBtn">Modify</button>
+
+        <button type="button" class="btn btn-info listBtn">List</button>
+
+        <script th:inline="javascript">
+            var thisForm=$('form');
+
+            $('.modifyBtn').click(function ()
+            {
+                if(!confirm("수정을 진행하시겠습니까?"))
+                {
+                    return;
+                }
+
+                thisForm
+                    .attr("action","/member/update")
+                    .attr("method","post")
+                    .submit();
+            });
+
+            $('.listBtn').click(function (){
+                thisForm.empty();
+                location.href="/main";
+            })
+
+        </script>
+    </th:block>
+</th:block>
+</html>

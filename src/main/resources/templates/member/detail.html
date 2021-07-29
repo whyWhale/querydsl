@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+
+<th:block th:replace="~{/fragments/layout::setContent(~{this::content})}">
+    <th:block th:fragment="content">
+
+        <div class="container-xl">
+            <div class="form-group">
+                <label></label>
+                <input type="hidden" class="form-control" name="id" th:value="${memberResponseDto.id}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>username</label>
+                <input type="text" class="form-control" name="username" th:value="${memberResponseDto.username}"
+                       readonly>
+            </div>
+
+            <div class="form-group">
+                <label>age</label>
+                <input type="text" class="form-control" name="age" th:value="${memberResponseDto.age}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>createdDate</label>
+                <input type="text" class="form-control" name="createdDate" th:value="${memberResponseDto.createdDate}"
+                       readonly>
+            </div>
+            <a th:href="@{/member/update(memberId=${memberResponseDto.id})}">
+                <button type="button" class="btn btn-primary">Modify</button>
+            </a>
+
+            <a th:href="@{/main}">
+                <button type="button" class="btn btn-primary">list</button>
+            </a>
+
+        </div>
+    </th:block>
+</th:block>
+</html>
