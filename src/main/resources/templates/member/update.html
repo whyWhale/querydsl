@@ -3,21 +3,28 @@
 <th:block th:replace="~{/fragments/layout::setContent(~{this::content})}">
 
     <th:block th:fragment="content">
-        <form action="/member/update" method="post">
+        <form action="/member/update" method="post" th:object="${memberResponseDto}">
         <div class="container-xl">
             <div class="form-group">
-                <label ></label>
-                <input type="hidden" class="form-control" name="id" th:value="${memberResponseDto.id}" readonly >
+                <input type="hidden" class="form-control" name="id" th:field="*{id}" readonly>
             </div>
 
             <div class="form-group">
                 <label >username</label>
-                <input type="text" class="form-control" name="username" th:value="${memberResponseDto.username}"  >
+                <input type="text" class="form-control" name="username" th:field="*{username}"
+                       th:class="${#fields.errors('username')} ? 'error'">
+                <div th:if="${#fields.errors('username')}">
+                    <p th:text="${msg}"></p>
+                </div>
             </div>
 
             <div class="form-group">
                 <label >age</label>
-                <input type="text" class="form-control" name="age" th:value="${memberResponseDto.age}"  >
+                <input type="text" class="form-control" name="age" th:field="*{age}"
+                th:class="${#fields.hasErrors('age')} ? 'error'">
+                <div th:if="${#fields.errors('age')}">
+                    <p th:errors="*{age}"></p>
+                </div>
             </div>
         </div>
         </form>

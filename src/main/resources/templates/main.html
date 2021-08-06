@@ -36,7 +36,9 @@
 
             <tr th:each="dto : ${result.dtoList}" >
                 <th scope="row">
-                        [[${dto.memberId}]]
+                      <a th:href="@{/member/detail(memberId= ${dto.memberId})}">
+                          [[${dto.memberId}]]
+                      </a>
                 </th>
                 <td>[[${dto.username}]]</td>
                 <td>[[${dto.age}]]</td>
