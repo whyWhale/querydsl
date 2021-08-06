@@ -12,6 +12,8 @@ import study.querydsl.controller.requestDto.MemberSaveRequestDto;
 import study.querydsl.controller.requestDto.MemberUpdateRequestDto;
 import study.querydsl.controller.responseDto.MemberResponseDto;
 
+import javax.validation.Valid;
+
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/member")
@@ -28,7 +30,7 @@ public class MemberController {
     }
 
     @PostMapping("")
-    public String MemberCreate(MemberSaveRequestDto memberSaveRequestDto
+    public String MemberCreate(@Valid MemberSaveRequestDto memberSaveRequestDto
             , BindingResult bindingResult, RedirectAttributes redirectAttributes)
     {
         log.info("member Create Featuring ...  ");
@@ -55,14 +57,14 @@ public class MemberController {
 
    @PostMapping("/update")
     public String MemberUpdate(
-            @ModelAttribute("memberUpdateRequestDto")MemberUpdateRequestDto memberUpdateRequestDto
+            @Valid @ModelAttribute("memberUpdateRequestDto")MemberUpdateRequestDto memberUpdateRequestDto
             ,RedirectAttributes redirectAttributes, BindingResult bindingResult)
    {
        log.info("member Update Featuring .... -> "+memberUpdateRequestDto.toString());
        if(bindingResult.hasErrors())
        {
            log.warn("not property Field Value Error");
-           return "member/create";
+           return "member/update?memberId="+memberUpdateRequestDto.getId();
        }
        memberService.Update(memberUpdateRequestDto);
 //       redirectAttributes.addFlashAttribute("msg","멤버 등록 완료");

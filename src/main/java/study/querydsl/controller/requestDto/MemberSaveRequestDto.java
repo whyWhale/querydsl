@@ -4,14 +4,17 @@ import lombok.Builder;
 import lombok.Data;
 import study.querydsl.domain.Member.Member;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.*;
 
 @Data
 public class MemberSaveRequestDto {
-    @NotEmpty(message = "이름을 입력해주세요.")
+    @NotBlank(message = "이름을 입력해주세요!")
+    @Size(min = 2, max = 10, message = "이름은 1 ~ 10자 이여야 합니다!")
     private String username;
-    @Min(value = 1000,message = "100살 미만까지 입니다.")
+
+    @NotNull(message = "나이를 입력해주세요!")
+    @Max(value = 25, message = "25세 이하만 가능합니다.")
+    @Min(value = 18, message = "18살 이상만 가능합니다.")
     private Integer age;
 
     @Builder
